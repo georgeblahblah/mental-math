@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addition Tester</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the Inter font and overall layout */
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 3rem;
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 90%; /* Responsive width */
+            width: 500px; /* Max width for larger screens */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Space between elements */
+        }
+
+        .problem-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem; /* Larger font for numbers */
+            font-weight: 700; /* Bold font */
+            color: #334155; /* Darker text for contrast */
+            gap: 1.5rem; /* Space between numbers and plus sign */
+        }
+
+        .answer-display {
+            font-size: 3rem; /* Large font for answer */
+            font-weight: 600; /* Semi-bold */
+            color: #16a34a; /* Green for answer */
+            min-height: 4rem; /* Ensure space even when empty */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 2px solid #e2e8f0; /* Separator line */
+            padding-top: 1.5rem;
+            transition: opacity 0.5s ease-in-out; /* Smooth transition for answer visibility */
+            opacity: 0; /* Hidden by default */
+        }
+
+        .instructions {
+            font-size: 1.1rem;
+            color: #64748b; /* Gray text for instructions */
+            margin-top: 1rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .container {
+                padding: 2rem;
+                gap: 1.5rem;
+            }
+            .problem-display {
+                font-size: 2.5rem;
+                gap: 1rem;
+            }
+            .answer-display {
+                font-size: 2rem;
+                min-height: 3rem;
+                padding-top: 1rem;
+            }
+            .instructions {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-extrabold text-gray-800">Addition Challenge</h1>
+        <div class="problem-display">
+            <span id="number1"></span>
+            <span>+</span>
+            <span id="number2"></span>
+        </div>
+        <div id="answer" class="answer-display"></div>
+        <p class="instructions">Press the <span class="font-bold text-indigo-600">Spacebar</span> to reveal the answer or get a new problem.</p>
+    </div>
+
+    <script>
+        // Get references to HTML elements
+        const number1Span = document.getElementById('number1');
+        const number2Span = document.getElementById('number2');
+        const answerDiv = document.getElementById('answer');
+
+        // Variables to store the numbers and the state
+        let num1, num2, sum;
+        let answerVisible = false; // Flag to track if the answer is currently displayed
+
+        /**
+         * Generates a random integer between min and max (inclusive).
+         * @param {number} min - The minimum value.
+         * @param {number} max - The maximum value.
+         * @returns {number} A random integer.
+         */
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        /**
+         * Generates a new addition problem and updates the display.
+         */
+        function generateNewProblem() {
+            // Generate two random numbers between 1 and 9999
+            num1 = getRandomNumber(1, 9999);
+            num2 = getRandomNumber(1, 9999);
+            sum = num1 + num2; // Calculate the sum
+
+            // Display the numbers in the HTML
+            number1Span.textContent = num1;
+            number2Span.textContent = num2;
+
+            // Hide the answer and reset the state
+            answerDiv.textContent = '';
+            answerDiv.style.opacity = 0;
+            answerVisible = false;
+        }
+
+        /**
+         * Reveals the answer to the current problem.
+         */
+        function revealAnswer() {
+            answerDiv.textContent = sum; // Display the calculated sum
+            answerDiv.style.opacity = 1; // Make the answer visible
+            answerVisible = true; // Set the flag to true
+        }
+
+        // Event listener for keydown events (specifically the spacebar)
+        document.addEventListener('keydown', (event) => {
+            // Check if the pressed key is the spacebar (keyCode 32 or 'Space')
+            if (event.code === 'Space' || event.keyCode === 32) {
+                event.preventDefault(); // Prevent default spacebar action (e.g., scrolling)
+
+                if (answerVisible) {
+                    // If the answer is already visible, generate a new problem
+                    generateNewProblem();
+                } else {
+                    // If the answer is not visible, reveal it
+                    revealAnswer();
+                }
+            }
+        });
+
+        // Initialize the first problem when the page loads
+        document.addEventListener('DOMContentLoaded', generateNewProblem);
+    </script>
+</body>
+</html>
