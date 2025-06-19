@@ -27,7 +27,7 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             text-align: center;
             max-width: 90%; /* Responsive width */
-            width: 500px; /* Max width for larger screens */
+            width: 700px; /* Max width for larger screens */
             display: flex;
             flex-direction: column;
             gap: 2rem; /* Space between elements */
@@ -63,6 +63,21 @@
             margin-top: 1rem;
         }
 
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+            transform: translateY(0);
+        }
+
+        .tab-button:active {
+            transform: translateY(2px);
+        }
+
+        .tab-button.active {
+            background-color: #3b82f6; /* Blue-500 */
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); /* Soft blue shadow */
+        }
+
         /* Responsive adjustments */
         @media (max-width: 600px) {
             .container {
@@ -81,12 +96,27 @@
             .instructions {
                 font-size: 0.9rem;
             }
+            .tabs {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            .tab-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-4xl font-extrabold text-gray-800">Addition Challenge</h1>
+
+        <!-- Tab buttons for difficulty selection -->
+        <div class="tabs flex flex-wrap justify-center gap-4 mb-8">
+            <button id="tab2" class="tab-button px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-blue-100">2-Digit & 3-Digit</button>
+            <button id="tab3" class="tab-button px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-blue-100">3-Digit Only</button>
+            <button id="tab4" class="tab-button px-6 py-3 rounded-xl bg-gray-200 text-gray-700 font-bold hover:bg-blue-100">4-Digit & Mixed</button>
+        </div>
+
         <div class="problem-display">
             <span id="number1"></span>
             <span>+</span>
@@ -101,10 +131,14 @@
         const number1Span = document.getElementById('number1');
         const number2Span = document.getElementById('number2');
         const answerDiv = document.getElementById('answer');
+        const tab2Button = document.getElementById('tab2');
+        const tab3Button = document.getElementById('tab3');
+        const tab4Button = document.getElementById('tab4');
 
         // Variables to store the numbers and the state
         let num1, num2, sum;
         let answerVisible = false; // Flag to track if the answer is currently displayed
+        let currentTab = 'tab2'; // Default starting tab
 
         /**
          * Generates a random integer between min and max (inclusive).
@@ -117,12 +151,28 @@
         }
 
         /**
-         * Generates a new addition problem and updates the display.
+         * Generates a new addition problem based on the current tab's difficulty.
          */
         function generateNewProblem() {
-            // Generate two random numbers between 1 and 9999
-            num1 = getRandomNumber(1, 9999);
-            num2 = getRandomNumber(1, 9999);
+            let min1, max1, min2, max2;
+
+            // Determine number ranges based on the active tab
+            if (currentTab === 'tab2') {
+                // Tab "2": Two 2-digit numbers (10-99) OR one 2-digit and one 3-digit number.
+                // Interpretation: One number is 2-digit, the other is 2-digit or 3-digit.
+                // This ensures a mix, with some problems being slightly harder than purely two 2-digit numbers.
+                num1 = getRandomNumber(10, 99); // 2-digit
+                num2 = getRandomNumber(10, 999); // 2 or 3-digit
+            } else if (currentTab === 'tab3') {
+                // Tab "3": Two 3-digit numbers.
+                num1 = getRandomNumber(100, 999); // 3-digit
+                num2 = getRandomNumber(100, 999); // 3-digit
+            } else if (currentTab === 'tab4') {
+                // Tab "4": One 4-digit number and one number which is 2 or 3 digits long.
+                num1 = getRandomNumber(1000, 9999); // 4-digit
+                num2 = getRandomNumber(10, 999); // 2 or 3-digit
+            }
+
             sum = num1 + num2; // Calculate the sum
 
             // Display the numbers in the HTML
@@ -144,6 +194,26 @@
             answerVisible = true; // Set the flag to true
         }
 
+        /**
+         * Sets the active tab and generates a new problem for that tab.
+         * @param {string} tabName - The ID of the tab to activate ('tab2', 'tab3', 'tab4').
+         */
+        function setTab(tabName) {
+            currentTab = tabName;
+            // Remove 'active' class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            // Add 'active' class to the clicked tab button
+            document.getElementById(tabName).classList.add('active');
+            generateNewProblem(); // Generate a new problem for the newly selected tab
+        }
+
+        // Event listeners for tab buttons
+        tab2Button.addEventListener('click', () => setTab('tab2'));
+        tab3Button.addEventListener('click', () => setTab('tab3'));
+        tab4Button.addEventListener('click', () => setTab('tab4'));
+
         // Event listener for keydown events (specifically the spacebar)
         document.addEventListener('keydown', (event) => {
             // Check if the pressed key is the spacebar (keyCode 32 or 'Space')
@@ -160,8 +230,10 @@
             }
         });
 
-        // Initialize the first problem when the page loads
-        document.addEventListener('DOMContentLoaded', generateNewProblem);
+        // Initialize the first problem when the page loads, setting the default tab
+        document.addEventListener('DOMContentLoaded', () => {
+            setTab(currentTab); // This will set 'tab2' as active and generate the first problem
+        });
     </script>
 </body>
 </html>
